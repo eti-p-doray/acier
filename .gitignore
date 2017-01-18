@@ -1,3 +1,6 @@
+# Build directory
+bazel*
+
 # Compiled Object files
 *.slo
 *.lo
