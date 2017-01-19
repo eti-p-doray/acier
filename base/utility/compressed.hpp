@@ -2,15 +2,14 @@
 
 #include <type_traits>
 
-#include "base/utility/type_traits.hpp"
 #include "base/utility/forward.hpp"
+#include "base/utility/type_traits.hpp"
 
-namespace base { 
+namespace acier {
 
 template <class T, class = when<true>>
 class compressed {
  public:
-
  	constexpr compressed(T&& value)
  			: member(fw<T>(value)) {}
 
@@ -29,7 +28,7 @@ class compressed {
 };
 
 template <class T>
-class compressed<T, when<std::is_empty<T>{} && !std::is_final<T>{}>> 
+class compressed<T, when< std::is_empty<T>{} && !std::is_final<T>{} >> 
 		: private T {
  public:
 	constexpr compressed(T&& value)
