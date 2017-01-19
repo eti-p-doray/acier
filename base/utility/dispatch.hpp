@@ -1,9 +1,13 @@
 #pragma once
 
-namespace base {
+#include <cstddef>
+
+namespace acier {
 
 // dispatching tags with priority
-template <size_t> struct dispatch_tag : tag<i-1> { using base = tag<i-1>; };
+template <std::size_t i> struct dispatch_tag : dispatch_tag<i-1> { 
+  using base = dispatch_tag<i-1>; 
+};
 template <> struct dispatch_tag<0> {};
 
 // overload_tag has precedence over default_tag

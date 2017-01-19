@@ -2,76 +2,84 @@
 
 #include <type_traits>
 
-namespace base {
+namespace acier {
+
+constexpr struct ignore_t {} ignore {};
+constexpr struct blank_t {} blank {};
 
 template <class T>
-using remove_const_t = typename remove_const<T>::type;
-template <class T>
-using remove_volatile_t = typename remove_volatile<T>::type;
-template <class T>
-using remove_cv_t = typename remove_cv<T>::type;
-template <class T>
-using add_const_t = typename add_const<T>::type;
-template <class T>
-using add_volatile_t = typename add_volatile<T>::type;
-template <class T>
-using add_cv_t = typename add_cv<T>::type;
+struct type_ { using type = T; };
+template <template <class...> class T>
+struct typefcn_ {
+  template <class... U>
+  using type = T<U...>; 
+};
 
-template <class T>
-using remove_reference_t = typename remove_reference<T>::type;
-template <class T>
-using add_lvalue_reference_t = typename add_lvalue_reference<T>::type;
-template <class T>
-using add_rvalue_reference_t = typename add_rvalue_reference<T>::type;
+template <class T> using _t = typename T::type;
 
-template <class T>
-using make_signed_t = typename make_signed<T>::type;
-template <class T>
-using make_unsigned_t = typename make_unsigned<T>::type;
+template <class T> using remove_const_t = _t<std::remove_const<T>>;
+template <class T> using remove_volatile_t = _t<std::remove_volatile<T>>;
+template <class T> using remove_cv_t = _t<std::remove_cv<T>>;
+template <class T> using add_const_t = _t<std::add_const<T>>;
+template <class T> using add_volatile_t = _t<std::add_volatile<T>>;
+template <class T> using add_cv_t = _t<std::add_cv<T>>;
 
-template <class T>
-using remove_extent_t = typename remove_extent<T>::type;
-template <class T>
-using remove_all_extents_t = typename remove_all_extents<T>::type;
+template <class T> using remove_reference_t = _t<std::remove_reference<T>>;
+template <class T> 
+using add_lvalue_reference_t = _t<std::add_lvalue_reference<T>>;
+template <class T> 
+using add_rvalue_reference_t = _t<std::add_rvalue_reference<T>>;
 
-template <class T>
-using remove_pointer_t = typename remove_pointer<T>::type;
-template <class T>
-using add_pointer_t = typename add_pointer<T>::type;
+template <class T> using make_signed_t = _t<std::make_signed<T>>;
+template <class T> using make_unsigned_t = _t<std::make_unsigned<T>>;
 
-//template <size_t Len,
-//size_t Align = /*default-alignment*/ > 
-//using aligned_storage_t = typename aligned_storage<Len, Align>::type;
+template <class T> using remove_extent_t = _t<std::remove_extent<T>>;
+template <class T> using remove_all_extents_t = _t<std::remove_all_extents<T>>;
+
+template <class T> using remove_pointer_t = _t<std::remove_pointer<T>>;
+template <class T> using add_pointer_t = _t<std::add_pointer<T>>;
+
+
+template <size_t Len, size_t Align = 0 > 
+using aligned_storage_t = _t<std::aligned_storage<Len, Align>>;
 template <size_t Len, class... Types>
-using aligned_union_t = typename aligned_union<Len, Types...>::type;
-template <class T>
-using decay_t = typename decay<T>::type;
-template <bool b, class T = void>
-using enable_if_t = typename enable_if<b, T>::type;
+using aligned_union_t = _t<std::aligned_union<Len, Types...>>;
+template <class T> using decay_t = _t<std::decay<T>>;
+template <bool b, class T = void> 
+using enable_if_t = _t<std::enable_if<b, T>>;
 template <bool b, class T, class F>
-using conditional_t = typename conditional<b, T, F>::type;
-template <class... T>
-using common_type_t = typename common_type<T...>::type;
-template <class T>
-using underlying_type_t = typename underlying_type<T>::type;
-template <class T>
-using result_of_t = typename result_of<T>::type;
+using conditional_t = _t<std::conditional<b, T, F>>;
+template <class... T> using common_type_t = _t<std::common_type<T...>>;
+template <class T> using underlying_type_t = _t<std::underlying_type<T>>;
+template <class T> using result_of_t = _t<std::result_of<T>>;
 
-
-//template <class... T>
-//struct models : is_callable<T> {};
-
-template <class T>
-constexpr std::true_type returns(T) { return {}; }
-constexpr std::true_type expect_true(std::true_type) { return {}; }
-constexpr std::true_type expect_false(std::false_type) { return {}; }
 
 template <class... T>
 struct always_true : std::true_type {};
 
 template <bool C>
 using when = std::enable_if_t<C, int>;
-template <class... Expr>
-using when_valid = std::enable_if_t<always_true<T...>, int>; 
+template <class... E>
+using when_valid = std::enable_if_t<always_true<E...>{}, int>; 
+
+
+template <class T, class R = ignore_t, class = when<true>>
+struct is_callable : std::false_type {};
+template <class T>
+struct is_callable<T, ignore_t, when_valid<result_of_t<T>>> 
+    : std::true_type {};
+template <class T, class R>
+struct is_callable<T, R, when_valid<result_of_t<T>>>
+    : std::is_convertible<result_of_t<T>, R> {};
+
+
+template <class T>
+constexpr std::true_type returns(T) { return {}; }
+
+constexpr std::true_type expect_true(std::true_type) { return {}; }
+constexpr std::true_type expect_false(std::false_type) { return {}; }
+
+template <class T>
+constexpr type_<T> type_of(T&&) { return {}; }
 
 }
