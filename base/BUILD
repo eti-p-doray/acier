@@ -1,12 +1,10 @@
 cc_library(
     name = "base",
     hdrs = [
-      "functional/invoke.hpp",
-      "functional/wrapper.hpp",
+      "functional/operators.hpp",
       "utility/compressed.hpp",
       "utility/dispatch.hpp",
-      "utility/forward.hpp",
-      "utility/integral_constant.hpp",
+      "utility/operators.hpp",
       "utility/type_traits.hpp",
     ],
     visibility = ["//visibility:public"],
@@ -14,10 +12,7 @@ cc_library(
 
 cc_test(
   name = "base_unittest",
-  srcs = [
-    "functional/invoke_unittest.cpp",
-    "utility/compressed_unittest.cpp",
-  ],
+  srcs = [],
   copts = ["-Iexternal/gtest/include", "-std=c++14"],
   deps = [
     "@gtest//:main",

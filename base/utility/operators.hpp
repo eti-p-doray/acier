@@ -7,9 +7,9 @@
 namespace acier {
 
 template <class T, class U>
-struct is_equality_comparable : is_callable<equal_to(T, U), bool> {};
+struct is_equality_comparable : is_callable_r<equal_to, T, U, bool> {};
 
-namespace equality_comparison { 
+namespace equality_comparison {
 
 template <class T, class U,
 		when< is_equality_comparable<T, U>{} > = 0>
